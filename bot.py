@@ -6,45 +6,46 @@ UPPER_BOUND = 4.4
 LOWER_BOUND = 3.8
 
 # توکن ربات و آیدی چت (یا @channelusername)
-BOT_TOKEN = 'YOUR_BOT_TOKEN'
-CHAT_ID = 'YOUR_CHAT_ID_OR_CHANNEL'
 
 TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHANNEL_ID = os.getenv('CHANNEL_ID')
 
+
 def get_prices():
-    url = 'https://www.tgju.org/'
-    headers = {'User-Agent': 'Mozilla/5.0'}
+    try:
+        url = "https://www.tgju.org/"
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.text, 'html.parser')
+        # استخراج قیمت طلای 18 عیار
+        gold_18k_elem = soup.find('tr', {'data-market-row': 'price_geram18'})
+        gold_price_18k = float(gold_18k_elem.find('td', {'data-col': 'close'}).text.replace(',', ''))
 
-    coin_element = soup.find('td', string='سکه امامی')
-    gold_element = soup.find('td', string='طلای ۱۸ عیار')
+        # استخراج قیمت سکه امامی
+        coin_emami_elem = soup.find('tr', {'data-market-row': 'price_emami'})
+        coin_price = float(coin_emami_elem.find('td', {'data-col': 'close'}).text.replace(',', ''))
 
-    if not coin_element or not gold_element:
+        return gold_price_18k, coin_price
+    except Exception as e:
         return None, None
 
-    coin_price = int(coin_element.find_next_sibling('td').text.replace(',', '').strip())
-    gold_price = int(gold_element.find_next_sibling('td').text.replace(',', '').strip())
 
-    return coin_price, gold_price
-
-def analyze_market(coin_price, gold_price):
-    if not coin_price or not gold_price:
-        return "❌ خطا در دریافت قیمت‌ها از tgju.org"
-
-    ratio = coin_price / gold_price
-    message = f"💰 نسبت سکه به طلا: {ratio:.2f}\n"
-
-    if ratio > UPPER_BOUND:
-        message += "📉 سکه گرونه، بهتره طلا بخری."
-    elif ratio < LOWER_BOUND:
-        message += "📈 سکه ارزونه، فرصت برای خرید سکه."
+def gold_to_coin_ratio(gold_price_18k, coin_price):
+    if gold_price_18k is None or coin_price is None:
+        return None, "خطا در استخراج قیمت‌ها"
+    
+    ratio = gold_price_18k / coin_price
+    
+    # آستانه‌ها
+    if ratio > 0.00032:
+        recommendation = "خرید طلای خام بهتر است (حباب سکه بالا)"
+    elif ratio < 0.00028:
+        recommendation = "خرید سکه بهتر است (حباب سکه کم)"
     else:
-        message += "⚖️ بازار نرماله. عجله نکن!"
-
-    return message
+        recommendation = "تصمیم بستگی به استراتژی شما دارد (حباب متعادل)"
+    
+    return ratio, recommendation
 
 def send_to_telegram(message):
     url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
@@ -54,7 +55,14 @@ def send_to_telegram(message):
     }
     requests.post(url, data=data)
 
+
+def main():
+    gold_price_18k, coin_price = get_prices()
+    ratio, recommendation = gold_to_coin_ratio(gold_price_18k, coin_price)
+    
+    send_to_telegram(recommendation)
+
+
+
 if __name__ == '__main__':
-    coin, gold = get_prices()
-    msg = analyze_market(coin, gold)
-    send_to_telegram(msg)
+    main()
