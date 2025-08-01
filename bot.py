@@ -17,7 +17,7 @@ def get_prices():
         
         return gold_price, coin_price, ounce_price
     except Exception as e:
-        return None, None
+        return None, None, None
 
 
 def gold_to_coin_ratio(gold_price, coin_price):
