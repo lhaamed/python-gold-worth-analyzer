@@ -1,0 +1,43 @@
+name: Gold Worth Analyzer Bot
+
+on:
+  schedule:
+    - cron: '30 6 * * *' # ساعت 9 صبح به وقت ایران
+  workflow_dispatch:      # برای اجرای دستی هم فعالش کن
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run bot script
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+        run: |
+          echo "import os
+import requests
+from datetime import datetime
+
+token = os.getenv('TELEGRAM_TOKEN')
+chat_id = os.getenv('CHANNEL_ID')
+
+now = datetime.now().strftime('%Y-%m-%d %H:%M')
+text = f'🗓 پیام خودکار امروز: {now}'
+
+url = f'https://api.telegram.org/bot{token}/sendMessage'
+data = {'chat_id': chat_id, 'text': text}
+r = requests.post(url, data=data)
+print(r.text)
+" > bot.py
+          python bot.py
