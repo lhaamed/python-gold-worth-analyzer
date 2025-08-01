@@ -55,13 +55,14 @@ def extract_price_out_of_url(url):
 
 
 
-def send_to_telegram(gold_price,coin_price,recommendation):
+def send_to_telegram(gold_price,coin_price,ounce_price,recommendation):
     url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
 
     message = (
         f"💰 قیمت‌ها امروز:\n"
-        f"• طلا: {(gold_price/10):,} تومان\n"
-        f"• سکه: {(coin_price/10):,} تومان\n"
+        f"• طلا: {(gold_price/10):,} IRT\n"
+        f"• سکه: {(coin_price/10):,} IRT\n"
+        f"• اونس جهانی: {(ounce_price):,} USD\n"
         f"\n📌 توصیه:\n{recommendation}"
     )
     
@@ -75,7 +76,7 @@ def main():
     gold_price, coin_price, ounce_price = get_prices()
     ratio, recommendation = gold_to_coin_ratio(gold_price, coin_price)
     
-    send_to_telegram(gold_price, coin_price,recommendation)
+    send_to_telegram(gold_price, coin_price,ounce_price,recommendation)
 
 if __name__ == '__main__':
     main()
