@@ -14,18 +14,15 @@ CHANNEL_ID = os.getenv('CHANNEL_ID')
 
 def get_prices():
     try:
-        gold_18k_price = extract_price_out_of_url("https://www.tgju.org/profile/geram18");
-        coin_emami_price = extract_price_out_of_url("https://www.tgju.org/profile/sekee");
-
-
+        gold_price = extract_price_out_of_url("https://www.tgju.org/profile/geram18");
+        coin_price = extract_price_out_of_url("https://www.tgju.org/profile/sekee");        
         
-        
-        return gold_18k_price, coin_emami_price
+        return gold_price, coin_price
     except Exception as e:
         return None, None
 
 
-def gold_to_coin_ratio(gold_price_18k, coin_price):
+def gold_to_coin_ratio(gold_price, coin_price):
     if gold_price_18k is None or coin_price is None:
         return None, "خطا در استخراج قیمت‌ها"
     
@@ -46,8 +43,8 @@ def send_to_telegram(gold_price,coin_price,recommendation):
 
     message = (
         f"💰 قیمت‌ها امروز:\n"
-        f"• طلا: {gold_price:,} تومان\n"
-        f"• سکه: {coin_price:,} تومان\n"
+        f"• طلا: {gold_price:,} ریال\n"
+        f"• سکه: {coin_price:,} ریال\n"
         f"\n📌 توصیه:\n{recommendation}"
     )
     
