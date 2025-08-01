@@ -60,8 +60,8 @@ def send_to_telegram(gold_price,coin_price,ounce_price,recommendation):
 
     message = (
         f"💰 قیمت‌ها امروز:\n"
-        f"• طلا: {gold_price:,} تومن\n"
-        f"• سکه: {coin_price:,} تومن\n"
+        f"• طلا: {(gold_price//10):,} تومن\n"
+        f"• سکه: {(coin_price//10):,} تومن\n"
         f"• اونس جهانی: {(ounce_price):,} دلار آمریکا\n"
         f"\n📌 توصیه:\n{recommendation}"
     )
@@ -76,7 +76,7 @@ def main():
     gold_price, coin_price, ounce_price = get_prices()
     ratio, recommendation = gold_to_coin_ratio(gold_price, coin_price)
     
-    send_to_telegram(((int(gold_price))/10), ((int(coin_price))/10),ounce_price,recommendation)
+    send_to_telegram(gold_price, coin_price,ounce_price,recommendation)
 
 if __name__ == '__main__':
     main()
