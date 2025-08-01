@@ -1,21 +1,18 @@
-import requests
+import requests # type: ignore
 import os
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup # type: ignore
 
-# مقادیر مرزی تحلیل
-UPPER_BOUND = 4.4
-LOWER_BOUND = 3.8
+
 
 # توکن ربات و آیدی چت (یا @channelusername)
-
 TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHANNEL_ID = os.getenv('CHANNEL_ID')
 
 
 def get_prices():
     try:
-        gold_price = extract_price_out_of_url("https://www.tgju.org/profile/geram18");
-        coin_price = extract_price_out_of_url("https://www.tgju.org/profile/sekee");        
+        gold_price = extract_price_out_of_url("https://www.tgju.org/profile/geram18")
+        coin_price = extract_price_out_of_url("https://www.tgju.org/profile/sekee")     
         
         return gold_price, coin_price
     except Exception as e:
@@ -23,10 +20,10 @@ def get_prices():
 
 
 def gold_to_coin_ratio(gold_price, coin_price):
-    if gold_price_18k is None or coin_price is None:
+    if gold_price is None or coin_price is None:
         return None, "خطا در استخراج قیمت‌ها"
     
-    ratio = gold_price_18k / coin_price
+    ratio = gold_price / coin_price
     
     # آستانه‌ها
     if ratio > 0.00032:
