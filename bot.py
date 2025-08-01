@@ -57,7 +57,7 @@ def send_to_telegram(gold_price,coin_price,recommendation):
     }
     requests.post(url, data=data)
 
-def extract_price_out_of_url(url)
+def extract_price_out_of_url(url):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
     response = requests.get("https://www.tgju.org/profile/sekee", headers=headers)
     soup = BeautifulSoup(response.content, 'html.parser')
