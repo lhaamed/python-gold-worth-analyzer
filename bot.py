@@ -14,19 +14,33 @@ CHANNEL_ID = os.getenv('CHANNEL_ID')
 
 def get_prices():
     try:
-        url = "https://www.tgju.org/"
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-        response = requests.get(url, headers=headers)
-        soup = BeautifulSoup(response.content, 'html.parser')
 
-        # استخراج قیمت طلای 18 عیار
-        gold_18k_elem = soup.find('tr', {'data-market-row': 'price_geram18'})
-        gold_price_18k = float(gold_18k_elem.find('td', {'data-col': 'close'}).text.replace(',', ''))
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+
+        emami_coin_response = requests.get("https://www.tgju.org/profile/sekee", headers=headers)
+        emami_coin_soup = BeautifulSoup(emami_coin_response.content, 'html.parser')
+
+        gold_18k_response = requests.get("https://www.tgju.org/profile/geram18", headers=headers)
+        gold_18k_soup = BeautifulSoup(gold_18k_response.content, 'html.parser')
+
+
+        gold_18k_elem = gold_18k_soup.find('span', {'data-col': 'info.last_trade.PDrCotVal'})        
+        if gold_18k_elem:
+            price_text = gold_18k_elem.text  # خروجی: "146,000,000"
+            gold_price_18k = int(price_text.replace(',', ''))  # خروجی: 146000000
+        else:
+            raise ValueError("tag not found")
 
         # استخراج قیمت سکه امامی
-        coin_emami_elem = soup.find('tr', {'data-market-row': 'price_emami'})
-        coin_price = float(coin_emami_elem.find('td', {'data-col': 'close'}).text.replace(',', ''))
+        coin_emami_elem = emami_coin_soup.find('span', {'data-col': 'info.last_trade.PDrCotVal'})
 
+        if coin_emami_elem:
+            price_text = coin_emami_elem.text  # خروجی: "146,000,000"
+            coin_price = int(price_text.replace(',', ''))  # خروجی: 146000000
+        else:
+            raise ValueError("tag not found")
+
+        
         return gold_price_18k, coin_price
     except Exception as e:
         return None, None
