@@ -15,7 +15,7 @@ def get_prices():
         coin_price = extract_price_out_of_url("https://www.tgju.org/profile/sekee")     
         ounce_price = extract_price_out_of_url("https://www.tgju.org/profile/ons")     
         
-        return gold_price, coin_price,ounce_price
+        return gold_price, coin_price, ounce_price
     except Exception as e:
         return None, None
 
