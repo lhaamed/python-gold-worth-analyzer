@@ -65,7 +65,8 @@ def extract_price_out_of_url(url):
     element = soup.find('span', {'data-col': 'info.last_trade.PDrCotVal'})
     if element:
         price_text = element.text  # خروجی: "146,000,000"
-        return price = int(price_text.replace(',', ''))  # خروجی: 146000000
+        price = int(price_text.replace(',', ''))  # خروجی: 146000000
+        return price
     else:
         raise ValueError("tag not found")
 
