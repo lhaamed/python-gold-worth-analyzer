@@ -26,18 +26,18 @@ jobs:
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
         run: |
           echo "import os
-import requests
-from datetime import datetime
-
-token = os.getenv('TELEGRAM_TOKEN')
-chat_id = os.getenv('CHANNEL_ID')
-
-now = datetime.now().strftime('%Y-%m-%d %H:%M')
-text = f'🗓 پیام خودکار امروز: {now}'
-
-url = f'https://api.telegram.org/bot{token}/sendMessage'
-data = {'chat_id': chat_id, 'text': text}
-r = requests.post(url, data=data)
-print(r.text)
-" > bot.py
+          import requests
+          from datetime import datetime
+          
+          token = os.getenv('TELEGRAM_TOKEN')
+          chat_id = os.getenv('CHANNEL_ID')
+          
+          now = datetime.now().strftime('%Y-%m-%d %H:%M')
+          text = f'🗓 پیام خودکار امروز: {now}'
+          
+          url = f'https://api.telegram.org/bot{token}/sendMessage'
+          data = {'chat_id': chat_id, 'text': text}
+          r = requests.post(url, data=data)
+          print(r.text)
+          " > bot.py
           python bot.py
