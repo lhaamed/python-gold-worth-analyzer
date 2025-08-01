@@ -60,8 +60,8 @@ def send_to_telegram(gold_price,coin_price,recommendation):
 
     message = (
         f"💰 قیمت‌ها امروز:\n"
-        f"• طلا: {gold_price:,} ریال\n"
-        f"• سکه: {coin_price:,} ریال\n"
+        f"• طلا: {(gold_price/10):,} تومان\n"
+        f"• سکه: {(coin_price/10):,} تومان\n"
         f"\n📌 توصیه:\n{recommendation}"
     )
     
