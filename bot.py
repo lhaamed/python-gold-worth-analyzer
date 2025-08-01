@@ -53,7 +53,7 @@ def send_to_telegram(gold_price,coin_price,recommendation):
 
 def extract_price_out_of_url(url):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-    response = requests.get("https://www.tgju.org/profile/sekee", headers=headers)
+    response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, 'html.parser')
 
     element = soup.find('span', {'data-col': 'info.last_trade.PDrCotVal'})
@@ -70,8 +70,6 @@ def main():
     ratio, recommendation = gold_to_coin_ratio(gold_price, coin_price)
     
     send_to_telegram(gold_price, coin_price,recommendation)
-
-
 
 if __name__ == '__main__':
     main()
