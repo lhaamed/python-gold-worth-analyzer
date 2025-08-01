@@ -36,6 +36,11 @@ def gold_to_coin_ratio(gold_price, coin_price):
     
     return ratio, recommendation
 
+def extract_integer_part(text):
+    cleaned = text.replace(',', '')
+    integer_str = cleaned.split('.')[0]  # اگر نقطه نباشه، همون رشته رو برمی‌گردونه
+    return int(integer_str)
+
 def extract_price_out_of_url(url):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
     response = requests.get(url, headers=headers)
@@ -43,7 +48,7 @@ def extract_price_out_of_url(url):
 
     element = soup.find('span', {'data-col': 'info.last_trade.PDrCotVal'})
     if element:
-        price = int(element.text.replace(',', '').replace('٬', '').replace('，', ''))
+        price = extract_integer_part(element.text)
         return price
     else:
         raise ValueError("tag not found")
