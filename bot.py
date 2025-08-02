@@ -56,7 +56,7 @@ def extract_price_out_of_url(url):
 
 
 
-def send_to_telegram(gold_price,coin_price,ounce_price,coin_bubble_price,recommendation):
+def send_to_telegram(gold_price,coin_price,coin_bubble_price,ounce_price,recommendation):
     url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
 
     message = (
