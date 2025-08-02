@@ -29,11 +29,11 @@ def gold_to_coin_ratio(gold_price, coin_price):
     
     # آستانه‌ها
     if ratio > 0.00032:
-        recommendation = "خرید طلای خام بهتر است (حباب سکه بالا)"
+        recommendation = "خرید طلای خام بهتر است (حباب سکه بالا) " + ratio
     elif ratio < 0.00028:
-        recommendation = "خرید سکه بهتر است (حباب سکه کم)"
+        recommendation = "خرید سکه بهتر است (حباب سکه کم) " + ratio
     else:
-        recommendation = "تصمیم بستگی به استراتژی شما دارد (حباب متعادل)"
+        recommendation = "تصمیم بستگی به استراتژی شما دارد (حباب متعادل) " + ratio
     
     return ratio, recommendation
 
