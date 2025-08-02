@@ -12,12 +12,13 @@ CHANNEL_ID = os.getenv('CHANNEL_ID')
 def get_prices():
     try:
         gold_price = extract_price_out_of_url("https://www.tgju.org/profile/geram18")
-        coin_price = extract_price_out_of_url("https://www.tgju.org/profile/sekee")     
-        ounce_price = extract_price_out_of_url("https://www.tgju.org/profile/ons")     
+        coin_price = extract_price_out_of_url("https://www.tgju.org/profile/sekee")
+        coin_bubble_price = extract_price_out_of_url("https://www.tgju.org/profile/coin_blubber")
+        ounce_price = extract_price_out_of_url("https://www.tgju.org/profile/ons")
         
-        return gold_price, coin_price, ounce_price
+        return gold_price, coin_price,coin_bubble_price, ounce_price
     except Exception as e:
-        return None, None, None
+        return None, None, None, None
 
 
 def gold_to_coin_ratio(gold_price, coin_price):
@@ -55,13 +56,14 @@ def extract_price_out_of_url(url):
 
 
 
-def send_to_telegram(gold_price,coin_price,ounce_price,recommendation):
+def send_to_telegram(gold_price,coin_price,ounce_price,coin_bubble_price,recommendation):
     url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
 
     message = (
         f"💰 قیمت‌ها امروز:\n"
         f"• طلا: {(gold_price//10):,} تومن\n"
         f"• سکه: {(coin_price//10):,} تومن\n"
+        f"• حباب سکه: {(coin_bubble_price//10):,} تومن\n"
         f"• اونس جهانی: {(ounce_price):,} دلار آمریکا\n"
         f"\n📌 توصیه:\n{recommendation}"
     )
@@ -73,10 +75,10 @@ def send_to_telegram(gold_price,coin_price,ounce_price,recommendation):
     requests.post(url, data=data)
 
 def main():
-    gold_price, coin_price, ounce_price = get_prices()
+    gold_price, coin_price,coin_bubble_price , ounce_price = get_prices()
     ratio, recommendation = gold_to_coin_ratio(gold_price, coin_price)
     
-    send_to_telegram(gold_price, coin_price,ounce_price,recommendation)
+    send_to_telegram(gold_price, coin_price,coin_bubble_price,ounce_price,recommendation)
 
 if __name__ == '__main__':
     main()
