@@ -9,17 +9,6 @@ TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHANNEL_ID = os.getenv('CHANNEL_ID')
 
 
-def get_prices():
-    try:
-        gold_price = extract_price_out_of_url("https://www.tgju.org/profile/geram18")
-        coin_price = extract_price_out_of_url("https://www.tgju.org/profile/sekee")
-        coin_bubble_price = extract_price_out_of_url("https://www.tgju.org/profile/coin_blubber")
-        ounce_price = extract_price_out_of_url("https://www.tgju.org/profile/ons")
-        
-        return gold_price, coin_price,coin_bubble_price, ounce_price
-    except Exception as e:
-        return None, None, None, None
-
 
 def gold_to_coin_ratio(gold_price, coin_price):
     if gold_price is None or coin_price is None:
@@ -75,7 +64,11 @@ def send_to_telegram(gold_price,coin_price,coin_bubble_price,ounce_price,recomme
     requests.post(url, data=data)
 
 def main():
-    gold_price, coin_price,coin_bubble_price , ounce_price = get_prices()
+
+    gold_price = extract_price_out_of_url("https://www.tgju.org/profile/geram18")
+    coin_price = extract_price_out_of_url("https://www.tgju.org/profile/sekee")
+    coin_bubble_price = extract_price_out_of_url("https://www.tgju.org/profile/coin_blubber")
+    ounce_price = extract_price_out_of_url("https://www.tgju.org/profile/ons")
     ratio, recommendation = gold_to_coin_ratio(gold_price, coin_price)
     
     send_to_telegram(gold_price, coin_price,coin_bubble_price,ounce_price,recommendation)
