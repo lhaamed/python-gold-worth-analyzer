@@ -2,7 +2,7 @@ name: Gold Worth Analyzer Bot
 
 on:
   schedule:
-    - cron: '15 5 * * *' # ساعت 9 صبح به وقت ایران
+    - cron: '0 5,13 * * *' # ساعت 9 صبح به وقت ایران
   workflow_dispatch:      # برای اجرای دستی هم فعالش کن
 
 jobs:
