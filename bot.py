@@ -14,7 +14,7 @@ def gold_to_coin_ratio(gold_price, coin_price):
     if gold_price is None or coin_price is None:
         return None, "خطا در استخراج قیمت‌ها"
     
-    ratio = gold_price / coin_price
+    ratio = coin_price / (gold_price * 7.32);
     
     # آستانه‌ها
     if ratio > 0.00032:
