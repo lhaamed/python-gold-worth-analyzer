@@ -45,17 +45,8 @@ def extract_price_out_of_url(url):
 
 
 
-def send_to_telegram(gold_price,coin_price,coin_bubble_price,ounce_price,recommendation):
+def send_to_telegram(message):
     url = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
-
-    message = (
-        f"💰 قیمت‌ها امروز:\n"
-        f"• طلا: {(gold_price//10):,} تومن\n"
-        f"• سکه: {(coin_price//10):,} تومن\n"
-        f"• حباب سکه: {(coin_bubble_price//10):,} تومن\n"
-        f"• اونس جهانی: {(ounce_price):,} دلار آمریکا\n"
-        f"\n📌 توصیه:\n{recommendation}"
-    )
     
     data = {
         'chat_id': CHANNEL_ID,
@@ -65,13 +56,47 @@ def send_to_telegram(gold_price,coin_price,coin_bubble_price,ounce_price,recomme
 
 def main():
 
-    gold_price = extract_price_out_of_url("https://www.tgju.org/profile/geram18")
-    coin_price = extract_price_out_of_url("https://www.tgju.org/profile/sekee")
-    coin_bubble_price = extract_price_out_of_url("https://www.tgju.org/profile/coin_blubber")
-    ounce_price = extract_price_out_of_url("https://www.tgju.org/profile/ons")
-    ratio, recommendation = gold_to_coin_ratio(gold_price, coin_price)
+    gold18_gram_price = extract_price_out_of_url("https://www.tgju.org/profile/geram18")
+    gold24_gram_price = extract_price_out_of_url("https://www.tgju.org/profile/geram24")
+
     
-    send_to_telegram(gold_price, coin_price,coin_bubble_price,ounce_price,recommendation)
+    quarter_coin_price = extract_price_out_of_url("https://www.tgju.org/profile/rob")
+    half_coin_price = extract_price_out_of_url("https://www.tgju.org/profile/nim")
+    geram_coin_price = extract_price_out_of_url("https://www.tgju.org/profile/gerami")
+    bahar_azadi_coin_price = extract_price_out_of_url("https://www.tgju.org/profile/sekeb")
+    emami_coin_price = extract_price_out_of_url("https://www.tgju.org/profile/sekee")
+    emami_coin_bubble_price = extract_price_out_of_url("https://www.tgju.org/profile/coin_blubber")
+    ounce_price = extract_price_out_of_url("https://www.tgju.org/profile/ons")
+    
+    usd_price = extract_price_out_of_url("https://www.tgju.org/profile/price_dollar_rl")
+    euro_price = extract_price_out_of_url("https://www.tgju.org/profile/price_eur")
+    gbp_price = extract_price_out_of_url("https://www.tgju.org/profile/price_gbp")
+    aed_price = extract_price_out_of_url("https://www.tgju.org/profile/price_aed")
+    
+    ratio, recommendation = gold_to_coin_ratio(gold18_gram_price, emami_coin_price)
+
+    message = (
+        f"💰 قیمت‌ها امروز:\n"
+        f"• هرگرم طلا ۱۸عیار: {(gold18_gram_price//10):,} تومن\n"
+        f"• هرگرم طلا ۲۴عیار: {(gold24_gram_price//10):,} تومن\n"
+        f"\n"
+        f"• ربع سکه: {(quarter_coin_price//10):,} تومن\n"
+        f"• نیم سکه: {(half_coin_price//10):,} تومن\n"
+        f"• سکه گرمی: {(geram_coin_price//10):,} تومن\n"
+        f"• سکه بهارآزادی: {(bahar_azadi_coin_price//10):,} تومن\n"
+        f"• سکه امامی: {(emami_coin_price//10):,} تومن\n"
+        f"• حباب سکه امامی: {(emami_coin_bubble_price//10):,} تومن\n"
+        f"• اونس جهانی: {(ounce_price):,} دلار آمریکا\n"
+        f"\n"
+        f"• دلار آمریکا: {(usd_price):,} تومن\n"
+        f"• یورو: {(euro_price):,} تومن\n"
+        f"• پوند انگلیس: {(gbp_price):,} تومن\n"
+        f"• درهم امارات: {(aed_price):,} تومن\n"
+        f"\n"
+        f"\n📌 توصیه:\n{recommendation}"
+    )
+    
+    send_to_telegram(message)
 
 if __name__ == '__main__':
     main()
