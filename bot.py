@@ -58,6 +58,9 @@ def main():
 
     gold18_gram_price = extract_price_out_of_url("https://www.tgju.org/profile/geram18")
     gold24_gram_price = extract_price_out_of_url("https://www.tgju.org/profile/geram24")
+    
+    silver925_gram_price = extract_price_out_of_url("https://www.tgju.org/profile/silver_925")
+    silver999_gram_price = extract_price_out_of_url("https://www.tgju.org/profile/silver_999")
 
     
     quarter_coin_price = extract_price_out_of_url("https://www.tgju.org/profile/rob")
@@ -79,6 +82,9 @@ def main():
         f"💰 قیمت‌ها امروز:\n"
         f"• هرگرم طلا ۱۸عیار: {(gold18_gram_price//10):,} تومن\n"
         f"• هرگرم طلا ۲۴عیار: {(gold24_gram_price//10):,} تومن\n"
+        f"\n"
+        f"• هرگرم نقره ۹۲۵: {(silver925_gram_price//10):,} تومن\n"
+        f"• هرگرم نقره ۹۹۹: {(silver999_gram_price//10):,} تومن\n"
         f"\n"
         f"• ربع سکه: {(quarter_coin_price//10):,} تومن\n"
         f"• نیم سکه: {(half_coin_price//10):,} تومن\n"
