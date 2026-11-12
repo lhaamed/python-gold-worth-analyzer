@@ -16,10 +16,7 @@ BUBBLE_LOW, BUBBLE_HIGH = 5, 10   # درصد
 
 
 session = requests.Session()
-session.headers.update({
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    'Accept-Encoding': 'gzip, deflate',
-})
+session.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 
 def gold_to_coin_ratio(gold18_price, coin_price):
     # ارزش ذاتی = قیمت طلای خالص موجود در سکه (به معادل ۱۸ عیار)
