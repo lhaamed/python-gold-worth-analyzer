@@ -1,7 +1,9 @@
 import requests # type: ignore
 import os
-from bs4 import BeautifulSoup # type: ignore
 import time
+import math
+from bs4 import BeautifulSoup # type: ignore
+
 
 
 # توکن ربات و آیدی چت (یا @channelusername)
@@ -41,22 +43,33 @@ def extract_integer_part(text, as_float=False):
 
 def fetch_price(url, adapter):
     for attempt in range(1, 4):
-        response = session.get(url, timeout=TIMEOUT)
-        response.raise_for_status()
+        try:
+            response = session.get(url, timeout=TIMEOUT)
+        except (requests.Timeout, requests.ConnectionError):
+            if attempt == 3:
+                raise
+            print(f"Connection failed, attempt {attempt}/3 ({url})", flush=True)
+        else:
+            response.raise_for_status()
+            content = response.content
+            details = (
+                f"requested={url} final={response.url} "
+                f"status={response.status_code} "
+                f"content_type={response.headers.get('Content-Type', 'unknown')} "
+                f"bytes={len(content)}"
+            )
+            if content.strip():
+                try:
+                    return adapter(content)
+                except ValueError as exc:
+                    raise ValueError(f"{exc} ({details})") from exc
 
-        if response.content.strip():
-            return adapter(response.content)
+            print(f"Empty response, attempt {attempt}/3 ({details})", flush=True)
+            if attempt == 3:
+                raise RuntimeError(f"Empty response after 3 attempts ({details})")
 
-        print(
-            f"TGJU empty response: HTTP {response.status_code}, "
-            f"attempt {attempt}/3, URL: {response.url}",
-            flush=True,
-        )
+        time.sleep(2 ** (attempt - 1))
 
-        if attempt < 3:
-            time.sleep(2)
-
-    raise RuntimeError(f"TGJU returned an empty response 3 times: {url}")
 
 
 def tgju_adapter(content, as_float=False):
@@ -87,62 +100,82 @@ def send_to_telegram(message):
     response.raise_for_status()
 
 def main():
-
     if not TOKEN or not CHANNEL_ID:
         raise SystemExit("TELEGRAM_TOKEN or CHANNEL_ID is not set")
 
-    gold18_gram_price = fetch_price("https://www.tgju.org/profile/geram18", tgju_adapter)
-    gold24_gram_price = fetch_price("https://www.tgju.org/profile/geram24", tgju_adapter)
-    
-    silver925_gram_price = fetch_price("https://www.tgju.org/profile/silver_925", tgju_adapter)
-    silver999_gram_price = fetch_price("https://www.tgju.org/profile/silver_999", tgju_adapter)
-
-    
-    quarter_coin_price = fetch_price("https://www.tgju.org/profile/rob", tgju_adapter)
-    half_coin_price = fetch_price("https://www.tgju.org/profile/nim", tgju_adapter)
-    geram_coin_price = fetch_price("https://www.tgju.org/profile/gerami", tgju_adapter)
-    bahar_azadi_coin_price = fetch_price("https://www.tgju.org/profile/sekeb", tgju_adapter)
-    emami_coin_price = fetch_price("https://www.tgju.org/profile/sekee", tgju_adapter)
-    emami_coin_bubble_price = fetch_price("https://www.tgju.org/profile/coin_blubber", tgju_adapter)
-    ounce_price = fetch_price("https://www.tgju.org/profile/ons", lambda c: tgju_adapter(c, as_float=True))
-    
-    usd_price = fetch_price("https://www.tgju.org/profile/price_dollar_rl", tgju_adapter)
-    euro_price = fetch_price("https://www.tgju.org/profile/price_eur", tgju_adapter)
-    gbp_price = fetch_price("https://www.tgju.org/profile/price_gbp", tgju_adapter)
-    aed_price = fetch_price("https://www.tgju.org/profile/price_aed", tgju_adapter)
-
-
-    # yaran_shemsh5 = fetch_price("https://www.sarafiyaran.com/price/334/%D8%B4%D9%85%D8%B4-5-%DA%AF%D8%B1%D9%85%DB%8C-18-%D8%B9%DB%8C%D8%A7%D8%B1", sarafiyaran_adapter)
-
-    
-    ratio, recommendation = gold_to_coin_ratio(gold18_gram_price, emami_coin_price)
-
-    message = (
-        f"💰 قیمت‌ها امروز:\n"
-        f"• هرگرم طلا ۱۸عیار: {(gold18_gram_price//10):,} تومن\n"
-        f"• هرگرم طلا ۲۴عیار: {(gold24_gram_price//10):,} تومن\n"
-        f"\n"
-        f"• هرگرم نقره ۹۲۵: {(silver925_gram_price//10):,} تومن\n"
-        f"• هرگرم نقره ۹۹۹: {(silver999_gram_price//10):,} تومن\n"
-        f"\n"
-        f"\n"
-        f"• ربع سکه: {(quarter_coin_price//10):,} تومن\n"
-        f"• نیم سکه: {(half_coin_price//10):,} تومن\n"
-        f"• سکه گرمی: {(geram_coin_price//10):,} تومن\n"
-        f"• سکه بهارآزادی: {(bahar_azadi_coin_price//10):,} تومن\n"
-        f"• سکه امامی: {(emami_coin_price//10):,} تومن\n"
-        f"• حباب سکه امامی: {(emami_coin_bubble_price//10):,} تومن\n"
-        f"• اونس جهانی: {ounce_price:,.2f} دلار آمریکا\n"
-        f"\n"
-        f"• دلار آمریکا: {(usd_price//10):,} تومن\n"
-        f"• یورو: {(euro_price//10):,} تومن\n"
-        f"• پوند انگلیس: {(gbp_price//10):,} تومن\n"
-        f"• درهم امارات: {(aed_price//10):,} تومن\n"
-        f"\n"
-        f"\n📌 توصیه:\n{recommendation}"
+    price_groups = (
+        (
+            ("geram18", "هر گرم طلا ۱۸ عیار"),
+            ("geram24", "هر گرم طلا ۲۴ عیار"),
+            ("yaran_shemsh5", "شمش ۵ گرمی طلای ۱۸ عیار"),
+        ),
+        (
+            ("silver_925", "هر گرم نقره ۹۲۵"),
+            ("silver_999", "هر گرم نقره ۹۹۹"),
+        ),
+        (
+            ("rob", "ربع سکه"),
+            ("nim", "نیم سکه"),
+            ("gerami", "سکه گرمی"),
+            ("sekeb", "سکه بهار آزادی"),
+            ("sekee", "سکه امامی"),
+            ("coin_blubber", "حباب سکه امامی"),
+            ("ons", "اونس جهانی"),
+        ),
+        (
+            ("price_dollar_rl", "دلار آمریکا"),
+            ("price_eur", "یورو"),
+            ("price_gbp", "پوند انگلیس"),
+            ("price_aed", "درهم امارات"),
+        ),
     )
-    
+
+    prices = {}
+    sections = []
+    for group in price_groups:
+        lines = []
+        for symbol, label in group:
+            url = f"https://www.tgju.org/profile/{symbol}"
+            adapter = tgju_adapter
+            if symbol == "ons":
+                adapter = lambda content: tgju_adapter(content, as_float=True)
+            elif symbol == "yaran_shemsh5":
+                url = (
+                    "https://www.sarafiyaran.com/price/334/"
+                    "%D8%B4%D9%85%D8%B4-5-%DA%AF%D8%B1%D9%85%DB%8C-18-%D8%B9%DB%8C%D8%A7%D8%B1"
+                )
+                adapter = sarafiyaran_adapter
+
+            try:
+                price = fetch_price(url, adapter)
+                if not math.isfinite(price):
+                    raise ValueError("Price is not finite")
+            except (requests.RequestException, ValueError, RuntimeError) as exc:
+                print(f"Skipping {symbol}: {exc}", flush=True)
+                continue
+
+            prices[symbol] = price
+            if symbol == "ons":
+                lines.append(f"• {label}: {price:,.2f} دلار آمریکا")
+            else:
+                lines.append(f"• {label}: {price // 10:,} تومن")
+
+        if lines:
+            sections.append("\n".join(lines))
+
+    if not sections:
+        raise SystemExit("No prices available. No Telegram message was sent.")
+
+    gold_price = prices.get("geram18")
+    coin_price = prices.get("sekee")
+    if gold_price is not None and gold_price > 0 and coin_price is not None:
+        _, recommendation = gold_to_coin_ratio(gold_price, coin_price)
+        sections.append(f"📌 توصیه:\n{recommendation}")
+
+    message = "💰 قیمت‌ها امروز:\n" + "\n\n".join(sections)
     send_to_telegram(message)
+
+
 
 if __name__ == '__main__':
     main()
