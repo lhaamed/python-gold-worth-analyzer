@@ -52,6 +52,7 @@ def tgju_adapter(content, as_float=False):
     soup = BeautifulSoup(content, 'html.parser')
     element = soup.find('span', {'data-col': 'info.last_trade.PDrCotVal'})
     if not element:
+        print(content[:500])
         raise ValueError("tgju: tag not found")
     return extract_integer_part(element.text, as_float)
 
@@ -101,7 +102,7 @@ def main():
     aed_price = fetch_price("https://www.tgju.org/profile/price_aed", tgju_adapter)
 
 
-    yaran_shemsh5 = fetch_price("https://www.sarafiyaran.com/price/334/%D8%B4%D9%85%D8%B4-5-%DA%AF%D8%B1%D9%85%DB%8C-18-%D8%B9%DB%8C%D8%A7%D8%B1", sarafiyaran_adapter)
+    # yaran_shemsh5 = fetch_price("https://www.sarafiyaran.com/price/334/%D8%B4%D9%85%D8%B4-5-%DA%AF%D8%B1%D9%85%DB%8C-18-%D8%B9%DB%8C%D8%A7%D8%B1", sarafiyaran_adapter)
 
     
     ratio, recommendation = gold_to_coin_ratio(gold18_gram_price, emami_coin_price)
@@ -114,7 +115,6 @@ def main():
         f"• هرگرم نقره ۹۲۵: {(silver925_gram_price//10):,} تومن\n"
         f"• هرگرم نقره ۹۹۹: {(silver999_gram_price//10):,} تومن\n"
         f"\n"
-        f"• شمش ۵ گرمی طلا ۱۸ عیار {(yaran_shemsh5//10):,} تومن\n"
         f"\n"
         f"• ربع سکه: {(quarter_coin_price//10):,} تومن\n"
         f"• نیم سکه: {(half_coin_price//10):,} تومن\n"
