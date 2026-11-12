@@ -1,7 +1,7 @@
 import requests # type: ignore
 import os
 from bs4 import BeautifulSoup # type: ignore
-
+import time
 
 
 # توکن ربات و آیدی چت (یا @channelusername)
@@ -40,16 +40,29 @@ def extract_integer_part(text, as_float=False):
     return float(cleaned) if as_float else int(cleaned.split('.')[0])
 
 def fetch_price(url, adapter):
-    response = session.get(url, timeout=TIMEOUT)
-    response.raise_for_status()
-    return adapter(response.content)
+    for attempt in range(1, 4):
+        response = session.get(url, timeout=TIMEOUT)
+        response.raise_for_status()
+
+        if response.content.strip():
+            return adapter(response.content)
+
+        print(
+            f"TGJU empty response: HTTP {response.status_code}, "
+            f"attempt {attempt}/3, URL: {response.url}",
+            flush=True,
+        )
+
+        if attempt < 3:
+            time.sleep(2)
+
+    raise RuntimeError(f"TGJU returned an empty response 3 times: {url}")
 
 
 def tgju_adapter(content, as_float=False):
     soup = BeautifulSoup(content, 'html.parser')
     element = soup.find('span', {'data-col': 'info.last_trade.PDrCotVal'})
     if not element:
-        print(content[:500])
         raise ValueError("tgju: tag not found")
     return extract_integer_part(element.text, as_float)
 
